@@ -33,5 +33,13 @@ The core is the shared code between the agents. It contains the following:
 - helper classes and functions such as the message history class, the agent response class, the agent config class, etc.
 - LLM utilities such as the LLM client, the chat completion client, the embedding client, etc.
 
+# Run the agents
+
+## Concierge
+chmod +x run_concierge.sh <br>
+./run_concierge.sh
 
 
+## RAG Resumes
+chmod +x run_rag_resumes.sh <br>
+./run_rag_resumes.sh

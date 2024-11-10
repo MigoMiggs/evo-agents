@@ -5,12 +5,12 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Set the PYTHONPATH to include your project root
 export PYTHONPATH="$SCRIPT_DIR:$PYTHONPATH"
-export PYTHONPATH="$(pwd)/agent-evo-concierge:$PYTHONPATH"
+export PYTHONPATH="$(pwd)/agent-evo-rag-resumes:$PYTHONPATH"
 
 
 # Default values
 HOST=${HOST:-"0.0.0.0"}
-PORT=${PORT:-8010}
+PORT=${PORT:-8011}
 WORKERS=${WORKERS:-1}
 RELOAD=${RELOAD:-"--reload"}
 
@@ -20,4 +20,3 @@ uvicorn app.main:app \
     --port $PORT \
     --workers $WORKERS \
     $RELOAD
-
