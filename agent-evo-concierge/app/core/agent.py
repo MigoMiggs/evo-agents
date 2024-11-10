@@ -5,7 +5,9 @@ from llama_index.agent.openai import OpenAIAgent
 from core.azure_llm import AzureLLM
 import os
 from llama_index.core import Settings
+from dotenv import load_dotenv
 
+load_dotenv()
 class ConciergeAgent(BaseAgent):
 
 
