@@ -34,7 +34,7 @@ class AzureLLM(BaseLLM):
     ) -> str:
         """Generate completion using Azure OpenAI"""
         try:
-            response = await openai.Completion.acreate(
+            response = await self.llm.Completion.acreate(
                 engine=self.deployment_name,
                 prompt=prompt,
                 max_tokens=max_tokens,

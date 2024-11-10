@@ -8,12 +8,12 @@ class MessageHistory(BaseModel):
 class Message(BaseModel):
     message: str
     role: str
-    context: Dict[str, Any]
+    context: str
     history: List[MessageHistory]
 
 class WorkRequest(BaseModel):
     task: str
-    context: Dict[str, Any]
+    context: str
     history: List[MessageHistory]
 
 class AgentResponse(BaseModel):

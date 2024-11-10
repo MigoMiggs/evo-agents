@@ -9,10 +9,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 class ConciergeAgent(BaseAgent):
-
+    
+    agent = None
 
     def __init__(self):
-
         self.llm = AzureLLM(
             model_config={
                 "deployment_name": os.getenv("AZURE_OPEN_AI_DEPLOYMENT_ID"),
@@ -33,7 +33,7 @@ class ConciergeAgent(BaseAgent):
         self,
         message: str,
         role: str,
-        context: dict,
+        context: str,
         history: List[MessageHistory]
     ) -> str:
         # Concierge-specific message processing implementation
@@ -43,7 +43,7 @@ class ConciergeAgent(BaseAgent):
     def process_work_request(
         self,
         task: str,
-        context: dict,
+        context: str,
         history: List[MessageHistory]
     ) -> str:
         # Concierge-specific task processing implementation

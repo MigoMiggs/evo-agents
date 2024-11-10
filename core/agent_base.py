@@ -13,7 +13,7 @@ class BaseAgent(ABC):
         self,
         message: str,
         role: str,
-        context: dict,
+        context: str,
         history: List[MessageHistory]
     ) -> str:
         """Process an incoming message"""
@@ -23,7 +23,7 @@ class BaseAgent(ABC):
     def process_work_request(
         self,
         task: str,
-        context: dict,
+        context: str,
         history: List[MessageHistory]
     ) -> str:
         """Process a work request"""

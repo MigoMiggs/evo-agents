@@ -11,7 +11,7 @@ class ResumeAgent(BaseAgent):
         self,
         message: str,
         role: str,
-        context: dict,
+        context: str,
         history: List[MessageHistory]
     ) -> str:
         # Resume-specific RAG processing implementation
@@ -20,7 +20,7 @@ class ResumeAgent(BaseAgent):
     def process_work_request(
         self,
         task: str,
-        context: dict,
+        context: str,
         history: List[MessageHistory]
     ) -> str:
         # Resume-specific task processing implementation
