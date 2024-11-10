@@ -13,4 +13,5 @@ venv/
 htmlcov/
 dist/
 build/
-*.egg-info/ 
+*.egg-info/
+# Remove core from dockerignore if it was there

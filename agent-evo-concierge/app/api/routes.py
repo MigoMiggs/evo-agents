@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from app.models.schemas import Message, WorkRequest, AgentResponse
-from app.services.agent_service import AgentService
+from core.schemas import Message, WorkRequest, AgentResponse
+from app.services.agent_service import ConciergeAgentService
 
 router = APIRouter()
-agent_service = AgentService()
+agent_service = ConciergeAgentService()
 
 @router.post("/restart")
 async def restart_agent():

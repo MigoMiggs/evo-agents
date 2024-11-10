@@ -6,6 +6,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the core module from parent directory
+COPY ../core ./core
+
 # Copy the rest of the application
 COPY ./app ./app
 

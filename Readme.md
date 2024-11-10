@@ -25,3 +25,13 @@ Every agent has the same structure. Every agent is a fast api service that expos
         - 'error' - the error of the work request
 
 
+# Evolve Agents Framework (CORE)
+The core is the shared code between the agents. It contains the following:
+- the agent class, which is the base class for all agents
+- the message and work request schemas, which are used to validate the data sent to the agents
+- the agent service, which contains the logic for the agents    
+- helper classes and functions such as the message history class, the agent response class, the agent config class, etc.
+- LLM utilities such as the LLM client, the chat completion client, the embedding client, etc.
+
+
+

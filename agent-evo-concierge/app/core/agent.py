@@ -1,9 +1,23 @@
 from typing import List
-from app.models.schemas import MessageHistory
+from core.agent_base import BaseAgent
+from core.schemas import MessageHistory
+from core.azure_llm import AzureLLM
+import os
+class ConciergeAgent(BaseAgent):
 
-class Agent:
+
     def __init__(self):
-        self.state = "initialized"
+        self.llm = AzureLLM(
+            model_config={
+                "deployment_name": os.getenv("AZURE_OPEN_AI_DEPLOYMENT_ID"),
+                "api_base": os.getenv("AZURE_OPENAI_ENDPOINT"),
+                "api_key": os.getenv("AZURE_OPENAI_API_KEY"),
+                "model": os.getenv("AZURE_OPENAI_MODEL"),
+                "api_version": os.getenv("AZURE_API_VERSION")
+            }
+        )
+
+        super().__init__()
 
     def process_message(
         self,
@@ -12,8 +26,8 @@ class Agent:
         context: dict,
         history: List[MessageHistory]
     ) -> str:
-        # Implement your agent's message processing logic here
-        return f"Processed message: {message}"
+        # Concierge-specific message processing implementation
+        return f"Processed concierge message: {message}"
 
     def process_work_request(
         self,
@@ -21,5 +35,5 @@ class Agent:
         context: dict,
         history: List[MessageHistory]
     ) -> str:
-        # Implement your agent's work request processing logic here
-        return f"Processed task: {task}" 
+        # Concierge-specific task processing implementation
+        return f"Processed concierge task: {task}" 
