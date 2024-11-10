@@ -1,19 +1,22 @@
-agent-evo-concierge/
+agent-rag-resumes/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py
 │   ├── api/
 │   │   ├── __init__.py
 │   │   └── routes.py
 │   ├── core/
 │   │   ├── __init__.py
-│   │   ├── config.py
-│   │   └── agent.py
+│   │   ├── agent.py
+│   │   └── config.py
 │   ├── models/
 │   │   ├── __init__.py
 │   │   └── schemas.py
-│   └── services/
-│       ├── __init__.py
-│       └── agent_service.py
-├── requirements.txt
-└── README.md 
+│   ├── services/
+│   │   ├── __init__.py
+│   │   └── agent_service.py
+│   └── main.py
+├── .dockerignore
+├── .env
+├── Dockerfile
+├── README.md
+└── requirements.txt 
