@@ -5,7 +5,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Set the PYTHONPATH to include your project root
 export PYTHONPATH="$SCRIPT_DIR:$PYTHONPATH"
-export PYTHONPATH="$(pwd)/agent-evo-rag-resumes:$PYTHONPATH"
+export PYTHONPATH="$(pwd)/agent-rag-resumes:$PYTHONPATH"
 
 
 # Default values
