@@ -1,0 +1,6 @@
+mkdir agent-to-agent-worker
+mkdir agent-to-agent-worker/app
+mkdir agent-to-agent-worker/app/api
+mkdir agent-to-agent-worker/app/core
+mkdir agent-to-agent-worker/app/models
+mkdir agent-to-agent-worker/app/services 
