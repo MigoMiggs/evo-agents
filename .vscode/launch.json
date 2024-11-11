@@ -23,6 +23,21 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/agent-evo-concierge"
             }
+        },
+        {
+            "name": "Agent Evo Concierge Chat",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "examples.chat_with_agent",
+            "args": [
+                "--url",
+                "http://localhost:8010",
+                "--message",
+                "Hello, how can you help me?"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/agent-evo-concierge:${workspaceFolder}/core"
+            }
         }
     ]
 }

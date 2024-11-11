@@ -9,7 +9,11 @@ core/
 ├── README.md
 ├── agent_base.py     # Base agent class definition
 ├── service_base.py   # Base service class for agent operations
-└── schemas.py        # Shared data models and schemas
+├── schemas.py        # Shared data models and schemas
+└── client/          # Client implementations for agent services
+    ├── __init__.py
+    ├── base.py      # Base client interface
+    └── http.py      # HTTP client implementation
 ```
 
 ## Components
@@ -36,6 +40,39 @@ Defines the standard data models used across all agents:
 - `Message` - Format for incoming messages
 - `WorkRequest` - Format for work requests
 - `AgentResponse` - Standard response format
+
+## Client Usage
+
+The core package provides client implementations for interacting with agent services:
+
+```python
+from core.client import HttpAgentClient
+from core.schemas import Message, WorkRequest
+
+async with HttpAgentClient("http://localhost:8000") as client:
+    # Restart agent
+    await client.restart()
+    
+    # Send message
+    message = Message(
+        message="Hello",
+        role="user",
+        context={},
+        history=[]
+    )
+    response = await client.process_message(message)
+    
+    # Get status
+    status = await client.get_status()
+    
+    # Send work request
+    work_request = WorkRequest(
+        task="analyze",
+        context={},
+        history=[]
+    )
+    response = await client.process_work_request(work_request)
+```
 
 ## Usage
 
