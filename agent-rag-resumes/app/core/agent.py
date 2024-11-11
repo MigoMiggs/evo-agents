@@ -1,6 +1,7 @@
 from typing import List
 from core.agent_base import BaseAgent
 from core.schemas import MessageHistory
+from core.azure_openai_llm import AzureOpenAILLM
 
 class ResumeAgent(BaseAgent):
     def __init__(self):

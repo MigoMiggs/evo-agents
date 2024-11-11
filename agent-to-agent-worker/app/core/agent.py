@@ -2,7 +2,7 @@ from typing import List
 from core.agent_base import BaseAgent
 from core.schemas import MessageHistory
 from llama_index.agent.openai import OpenAIAgent
-from core.azure_llm import AzureLLM
+from core.azure_openai_llm import AzureOpenAILLM
 import os
 from llama_index.core import Settings
 from dotenv import load_dotenv
@@ -22,7 +22,7 @@ class AgentWorker(BaseAgent):
     )
 
     def __init__(self):
-        self.llm = AzureLLM(
+        self.llm = AzureOpenAILLM(
             model_config={
                 "deployment_name": os.getenv("AZURE_OPEN_AI_DEPLOYMENT_ID"),
                 "api_base": os.getenv("AZURE_OPENAI_ENDPOINT"),
@@ -67,7 +67,10 @@ class AgentWorker(BaseAgent):
             agent_external_context=context
         )
 
-        chat_history = self.history_to_chat_messages(history)
+        if history is None:
+            chat_history = []    
+        else:
+            chat_history = self.history_to_chat_messages(history)
 
         self.agent = OpenAIAgent.from_tools(    
             llm=self.llm.llm,
@@ -76,6 +79,10 @@ class AgentWorker(BaseAgent):
         )
 
         # Simulate async work
-        await asyncio.sleep(1)  # Replace with actual async work
-        response = self.agent.chat(f"Please process this task: {task}")
+        for i in range(10):
+            await asyncio.sleep(1)  # Replace with actual async work
+            response = self.agent.chat(f"Please process this task: {task}")
+            print(f"Processing task: {task} - {i}") 
+            i += 1
+
         return response.response 

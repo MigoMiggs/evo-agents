@@ -4,7 +4,7 @@ from llama_index.llms.azure_openai import AzureOpenAI
 from .llm_base import BaseLLM
 
 
-class AzureLLM(BaseLLM):
+class AzureOpenAILLM(BaseLLM):
     """Azure OpenAI implementation of the LLM interface"""
     llm: AzureOpenAI
     

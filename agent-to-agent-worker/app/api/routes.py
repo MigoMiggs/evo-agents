@@ -44,7 +44,15 @@ async def get_status():
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/work-request", response_model=WorkResult)
-async def process_work_request(work_request: WorkRequest):
+async def process_work_request(
+    work_request: WorkRequest = WorkRequest(
+        task="Get the Concierge Aagent to have a friendly conversation and stop when feel it has been cordial.",
+        context="Example context information",
+        history=[
+            {"role": "user", "content": "Hello"},
+            {"role": "assistant", "content": "Hello"}
+        ]
+    )):
     """
     Process an asynchronous work request for the agent.
     

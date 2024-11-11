@@ -38,3 +38,10 @@ class WorkResult(BaseModel):
     memory: Optional[MessageHistory] = None
     created_at: datetime
     completed_at: Optional[datetime] = None 
+
+class WorkAgentToAgent(BaseModel):
+    target_agent_id: str
+    initial_message: Message
+    initial_context: str
+    max_turns: int = 10
+    

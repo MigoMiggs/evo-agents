@@ -6,6 +6,7 @@ from llama_index.core.base.llms.types import ChatMessage
 from datetime import datetime
 import uuid
 import asyncio
+from .azure_openai_llm import AzureOpenAILLM
 
 class BaseAgent(ABC):
     """Base class for all agents in the framework"""
@@ -30,6 +31,8 @@ class BaseAgent(ABC):
         self.work_items: Dict[str, WorkResult] = {}
 
     def history_to_chat_messages(self, history: List[MessageHistory]) -> List[ChatMessage]:
+        if history is None:
+            return []
         return [ChatMessage(role=m.role, content=m.content) for m in history]
         
     @abstractmethod
@@ -98,7 +101,11 @@ class BaseAgent(ABC):
         
     def get_work_result(self, work_id: str) -> Optional[WorkResult]:
         """Get the result of an async work request"""
-        return self.work_items.get(work_id)
+
+        if work_id not in self.work_items:
+            return None
+        
+        return self.work_items[work_id]
         
     def get_state(self) -> str:
         """Get current agent state"""
