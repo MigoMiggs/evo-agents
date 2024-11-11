@@ -43,9 +43,12 @@ class ConciergeAgent(BaseAgent):
             agent_external_context=context
         )
 
+        chat_history = self.history_to_chat_messages(history)
+
         self.agent = OpenAIAgent.from_tools(    
             llm=self.llm.llm,
-            system_prompt=sys_prompt
+            system_prompt=sys_prompt, 
+            chat_history=chat_history
         )
 
         print(sys_prompt)

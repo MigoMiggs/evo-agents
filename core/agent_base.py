@@ -2,6 +2,8 @@ from typing import List, Optional
 from abc import ABC, abstractmethod
 from core.schemas import MessageHistory, AgentResponse
 from llama_index.core import PromptTemplate
+from llama_index.core.base.llms.types import ChatMessage    
+
 
 class BaseAgent(ABC):
     """Base class for all agents in the framework"""
@@ -25,12 +27,9 @@ class BaseAgent(ABC):
     def __init__(self):
         self.state = "initialized"
 
-    def display_prompt_dict(prompts_dict):
-        for k, p in prompts_dict.items():
-            text_md = f"**Prompt Key**: {k}<br>" f"**Text:** <br>"
-            print(text_md)
-            print(p.get_template())
-            print("<br><br>")
+    # function that turns a lits of MessageHistory to a list of ChatMessage
+    def history_to_chat_messages(self, history: List[MessageHistory]) -> List[ChatMessage]:
+        return [ChatMessage(role=m.role, content=m.content) for m in history]
         
     @abstractmethod
     def process_message(
