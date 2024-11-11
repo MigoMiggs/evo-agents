@@ -1,6 +1,8 @@
-from typing import Dict, Any
-from core.schemas import Message, WorkRequest, AgentResponse
+from typing import Dict, Any, Optional
+from core.schemas import Message, WorkRequest, AgentResponse, WorkResult
 from core.agent_base import BaseAgent
+import uuid
+from datetime import datetime
 
 class BaseAgentService:
     """Base service class for handling agent operations"""
@@ -34,17 +36,23 @@ class BaseAgentService:
         """Get current service status"""
         return {"status": self.status}
 
-    def process_work_request(self, work_request: WorkRequest) -> AgentResponse:
-        """Process a work request"""
+    async def process_work_request(self, work_request: WorkRequest) -> WorkResult:
+        """Start an asynchronous work request"""
         try:
-            self.status = "in_progress"
-            result = self.agent.process_work_request(
+            return await self.agent.start_work(
                 work_request.task,
                 work_request.context,
                 work_request.history
             )
-            self.status = "completed"
-            return AgentResponse(status="completed", result=result)
         except Exception as e:
-            self.status = "failed"
-            return AgentResponse(status="failed", error=str(e)) 
+            return WorkResult(
+                work_id=str(uuid.uuid4()),
+                status="failed",
+                error=str(e),
+                created_at=datetime.utcnow(),
+                completed_at=datetime.utcnow()
+            )
+
+    def get_work_result(self, work_id: str) -> Optional[WorkResult]:
+        """Get the result of an async work request"""
+        return self.agent.get_work_result(work_id) 

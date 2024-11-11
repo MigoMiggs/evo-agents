@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from core.schemas import Message, WorkRequest, AgentResponse
+from core.schemas import Message, WorkRequest, AgentResponse, WorkResult
 from app.services.agent_service import AgentWorkerService
 
 router = APIRouter()
@@ -27,9 +27,19 @@ async def get_status():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/work-request", response_model=AgentResponse)
+@router.post("/work-request", response_model=WorkResult)
 async def process_work_request(work_request: WorkRequest):
     try:
-        return agent_service.process_work_request(work_request)
+        return await agent_service.process_work_request(work_request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/work-result/{work_id}", response_model=WorkResult)
+async def get_work_result(work_id: str):
+    try:
+        result = agent_service.get_work_result(work_id)
+        if result is None:
+            raise HTTPException(status_code=404, detail="Work request not found")
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 

@@ -31,7 +31,7 @@
             "module": "examples.chat_with_agent",
             "args": [
                 "--url",
-                "http://localhost:8010",
+                "http://18.191.0.123:8010/",
                 "--message",
                 "Hello, how can you help me?"
             ],

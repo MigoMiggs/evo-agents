@@ -6,6 +6,7 @@ from core.azure_llm import AzureLLM
 import os
 from llama_index.core import Settings
 from dotenv import load_dotenv
+import asyncio
 
 load_dotenv()
 
@@ -55,7 +56,7 @@ class AgentWorker(BaseAgent):
         response = self.agent.chat(message)
         return response.response
 
-    def process_work_request(
+    async def process_work_request(
         self,
         task: str,
         context: str,
@@ -74,5 +75,7 @@ class AgentWorker(BaseAgent):
             chat_history=chat_history
         )
 
+        # Simulate async work
+        await asyncio.sleep(1)  # Replace with actual async work
         response = self.agent.chat(f"Please process this task: {task}")
         return response.response 
