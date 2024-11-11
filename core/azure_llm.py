@@ -56,7 +56,7 @@ class AzureLLM(BaseLLM):
     ) -> str:
         """Generate chat completion using Azure OpenAI"""
         try:
-            response = await openai.ChatCompletion.acreate(
+            response = await self.llm.ChatCompletion.acreate(
                 engine=self.deployment_name,
                 messages=messages,
                 max_tokens=max_tokens,
@@ -71,7 +71,7 @@ class AzureLLM(BaseLLM):
     async def embed(self, text: str) -> List[float]:
         """Generate embeddings using Azure OpenAI"""
         try:
-            response = await openai.Embedding.acreate(
+            response = await self.llm.Embedding.acreate(
                 engine=self.embedding_deployment,
                 input=text
             )

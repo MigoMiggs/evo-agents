@@ -12,6 +12,10 @@ class ConciergeAgent(BaseAgent):
     
     agent = None
 
+    INTERNAL_CONTEXT = ("Your name is Evo the Concierge. \n"
+                        "You can help the user navigate through the Evolve system."
+    )
+
     def __init__(self):
         self.llm = AzureLLM(
             model_config={
@@ -21,10 +25,6 @@ class ConciergeAgent(BaseAgent):
                 "model": os.getenv("AZURE_OPENAI_MODEL"),
                 "api_version": os.getenv("AZURE_API_VERSION")
             }
-        )
-
-        self.agent = OpenAIAgent.from_tools(    
-            llm=self.llm.llm
         )
 
         super().__init__()
@@ -37,6 +37,18 @@ class ConciergeAgent(BaseAgent):
         history: List[MessageHistory]
     ) -> str:
         # Concierge-specific message processing implementation
+
+        sys_prompt = self.AGENT_SYS_PROMPT_TEMPLATE.format(
+            agent_internal_context=self.INTERNAL_CONTEXT,
+            agent_external_context=context
+        )
+
+        self.agent = OpenAIAgent.from_tools(    
+            llm=self.llm.llm,
+            system_prompt=sys_prompt
+        )
+
+        print(sys_prompt)
         response = self.agent.chat(message)
         return response.response
 
