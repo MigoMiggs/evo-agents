@@ -11,7 +11,7 @@ class Message(BaseModel):
     message: str
     role: str
     context: str
-    history: List[MessageHistory]
+    history: Optional[List[MessageHistory]] = None
 
 class WorkRequest(BaseModel):
     task: str
@@ -22,6 +22,7 @@ class AgentResponse(BaseModel):
     status: str
     result: Optional[str] = None
     error: Optional[str] = None
+    memory: Optional[MessageHistory] = None
 
 class WorkStatus(str, Enum):
     PENDING = "pending"
@@ -34,5 +35,6 @@ class WorkResult(BaseModel):
     status: WorkStatus
     result: Optional[str] = None
     error: Optional[str] = None
+    memory: Optional[MessageHistory] = None
     created_at: datetime
     completed_at: Optional[datetime] = None 
