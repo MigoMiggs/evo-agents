@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 from abc import ABC, abstractmethod
 from core.schemas import MessageHistory, AgentResponse, WorkResult, WorkStatus
 from llama_index.core import PromptTemplate
@@ -42,8 +42,20 @@ class BaseAgent(ABC):
         role: str,
         context: str,
         history: List[MessageHistory]
-    ) -> str:
-        """Process an incoming message"""
+    ) -> Tuple[str, List[MessageHistory]]:
+        """Process an incoming message
+        
+        Args:
+            message: The message content to process
+            role: The role of the message sender
+            context: Context information for processing
+            history: List of previous message history
+            
+        Returns:
+            Tuple containing:
+                - response_message: The agent's response text
+                - response_memory: List of MessageHistory objects representing the conversation memory
+        """
         pass
         
     @abstractmethod
@@ -52,8 +64,19 @@ class BaseAgent(ABC):
         task: str,
         context: str,
         history: List[MessageHistory]
-    ) -> str:
-        """Process a work request asynchronously"""
+    ) -> Tuple[str, List[MessageHistory]]:
+        """Process a work request asynchronously
+        
+        Args:
+            task: The task to process
+            context: Context information for processing
+            history: List of previous message history
+            
+        Returns:
+            Tuple containing:
+                - result: The work result text
+                - history: Updated message history list
+        """
         pass
 
     async def start_work(
@@ -90,9 +113,10 @@ class BaseAgent(ABC):
         work_result.status = WorkStatus.IN_PROGRESS
         
         try:
-            result = await self.process_work_request(task, context, history)
+            result, updated_history = await self.process_work_request(task, context, history)
             work_result.status = WorkStatus.COMPLETED
             work_result.result = result
+            work_result.memory = updated_history
         except Exception as e:
             work_result.status = WorkStatus.FAILED
             work_result.error = str(e)

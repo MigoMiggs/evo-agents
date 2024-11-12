@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from core.agent_base import BaseAgent
 from core.schemas import MessageHistory
 from llama_index.agent.openai import OpenAIAgent
@@ -35,7 +35,7 @@ class ConciergeAgent(BaseAgent):
         role: str,
         context: str,
         history: List[MessageHistory]
-    ) -> str:
+    ) -> Tuple[str, List[MessageHistory]]:
         # Concierge-specific message processing implementation
 
         sys_prompt = self.AGENT_SYS_PROMPT_TEMPLATE.format(
@@ -53,13 +53,24 @@ class ConciergeAgent(BaseAgent):
 
         print(sys_prompt)
         response = self.agent.chat(message)
-        return response.response
+        response_memory = self.agent.memory.get_all()
 
-    def process_work_request(
+        # convert response memory to list of MessageHistory objects
+        response_memory = [MessageHistory(role=m.role, content=m.content) for m in response_memory]
+        return response.response, response_memory
+
+    async def process_work_request(
         self,
         task: str,
         context: str,
         history: List[MessageHistory]
-    ) -> str:
+    ) -> Tuple[str, List[MessageHistory]]:
         # Concierge-specific task processing implementation
-        return f"Processed concierge task: {task}" 
+        result = f"Processed concierge task: {task}"
+        
+        # Create new history entries
+        task_message = MessageHistory(role="user", content=task)
+        response_message = MessageHistory(role="assistant", content=result)
+        updated_history = history + [task_message, response_message]
+        
+        return result, updated_history

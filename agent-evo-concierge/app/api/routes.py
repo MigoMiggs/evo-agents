@@ -54,4 +54,5 @@ async def process_work_request(work_request: WorkRequest):
     try:
         return agent_service.process_work_request(work_request)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
+

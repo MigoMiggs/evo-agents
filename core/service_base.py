@@ -20,14 +20,14 @@ class BaseAgentService:
         """Process an incoming message"""
         try:
             self.status = "in_progress"
-            result = self.agent.process_message(
+            result, response_memory = self.agent.process_message(
                 message.message,
                 message.role,
                 message.context,
                 message.history
             )
             self.status = "completed"
-            return AgentResponse(status="completed", result=result)
+            return AgentResponse(status="completed", result=result, memory=response_memory)
         except Exception as e:
             self.status = "failed"
             return AgentResponse(status="failed", error=str(e))

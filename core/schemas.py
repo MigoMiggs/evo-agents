@@ -22,7 +22,7 @@ class AgentResponse(BaseModel):
     status: str
     result: Optional[str] = None
     error: Optional[str] = None
-    memory: Optional[MessageHistory] = None
+    memory: Optional[List[MessageHistory]] = None
 
 class WorkStatus(str, Enum):
     PENDING = "pending"
@@ -35,12 +35,16 @@ class WorkResult(BaseModel):
     status: WorkStatus
     result: Optional[str] = None
     error: Optional[str] = None
-    memory: Optional[MessageHistory] = None
+    memory: Optional[List[MessageHistory]] = None
     created_at: datetime
     completed_at: Optional[datetime] = None 
 
+
+class TargetAgentEnum(str, Enum):
+    AGENT_CONCIERGE = "AGENT_CONCIERGE"
+
 class WorkAgentToAgent(BaseModel):
-    target_agent_id: str
+    target_agent_id: TargetAgentEnum
     initial_message: Message
     initial_context: str
     max_turns: int = 10

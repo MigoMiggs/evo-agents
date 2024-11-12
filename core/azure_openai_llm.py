@@ -20,6 +20,7 @@ class AzureOpenAILLM(BaseLLM):
                     azure_endpoint=self.model_config["api_base"],
                     api_version=self.model_config["api_version"],
                     model=self.model_config["model"],
+                    temperature=self.model_config.get("temperature", .25)
                 )
             
         self.is_initialized = True
