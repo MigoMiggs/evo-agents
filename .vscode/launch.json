@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Agent Evo Concierge",
             "type": "debugpy",
@@ -15,7 +16,7 @@
                 "--host",
                 "0.0.0.0",
                 "--port",
-                "8000"
+                "8010"
             ],
             "jinja": true,
             "justMyCode": true,
@@ -40,6 +41,25 @@
             }
         },
         {
+            "name": "Agent Evo Concierge File Upload",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "examples.upload_file_to_agent",
+            "args": [
+                "--url",
+                "http://localhost:8010",
+                "--file",
+                "${workspaceFolder}/examples/test.txt",
+                "--task",
+                "Process this text file",
+                "--context",
+                "This is a sample text file for testing"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/agent-evo-concierge:${workspaceFolder}/core"
+            }
+        },
+        {
             "name": "Agent To Agent Worker",
             "type": "debugpy",
             "request": "launch",
@@ -58,7 +78,6 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/agent-to-agent-worker"
             }
-        },
-
+        }
     ]
 }

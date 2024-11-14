@@ -1,8 +1,11 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, BinaryIO
 import aiohttp
 from urllib.parse import urljoin
 from .base import BaseAgentClient
-from ..schemas import Message, WorkRequest, AgentResponse
+from ..schemas import Message, WorkRequest, AgentResponse, WorkResult
+import aiofiles
+from pathlib import Path
+import json
 
 class HttpAgentClient(BaseAgentClient):
     """HTTP client implementation for interacting with agent services"""
@@ -63,4 +66,73 @@ class HttpAgentClient(BaseAgentClient):
         ) as response:
             response.raise_for_status()
             data = await response.json()
-            return AgentResponse(**data) 
+            return AgentResponse(**data)
+            
+    async def process_work_request_with_file(
+        self, 
+        work_request: WorkRequest,
+        file: BinaryIO,
+        filename: str,
+        content_type: str
+    ) -> WorkResult:
+        """Send a work request with file to the agent"""
+        await self._ensure_session()
+        
+        # Prepare multipart form data
+        data = aiohttp.FormData()
+        
+       
+        # Add the file
+        data.add_field('file',
+                      file,
+                      filename=filename,
+                      content_type=content_type)
+      
+         # Add work request fields as form data
+        #data.add_field('task', str(work_request.task))
+        #data.add_field('context', str(work_request.context or ""))
+
+        headers = {
+            'Accept': 'application/json',
+        }
+
+        url = self._get_url(f'/agent/work-request-with-file')
+
+        # Print request body for debugging
+        print("Request body:")
+        for field in data._fields:
+            print(f"Field {field[0]}: {field[2]}")
+            
+        async with self.session.post(
+            self._get_url('/agent/work-request-with-file'),
+            data=data,
+            headers=headers
+        ) as response:
+            response.raise_for_status()
+            data = await response.json()
+            print(data)
+            return WorkResult(**data)
+            
+    async def get_work_result(self, work_id: str) -> WorkResult:
+        """
+        Get the result of an async work request.
+        
+        Args:
+            work_id: The ID of the work request to check
+            
+        Returns:
+            WorkResult object containing the status and result/error
+        """
+        async with self.session.get(
+            f"{self.base_url}/agent/work-result/{work_id}"
+        ) as response:
+            if response.status != 200:
+                error_text = await response.text()
+                class AgentClientError(Exception):
+                    """Exception raised for errors in the agent client."""
+                    pass
+                
+                raise AgentClientError(f"Error getting work result: {error_text}")
+                
+            result = await response.json()
+            return WorkResult(**result)

@@ -1,12 +1,14 @@
 from typing import List, Optional, Dict, Tuple
 from abc import ABC, abstractmethod
-from core.schemas import MessageHistory, AgentResponse, WorkResult, WorkStatus
+from core.schemas import MessageHistory, AgentResponse, WorkResult, WorkStatus, WorkRequestFile
 from llama_index.core import PromptTemplate
 from llama_index.core.base.llms.types import ChatMessage
 from datetime import datetime
 import uuid
 import asyncio
 from .azure_openai_llm import AzureOpenAILLM
+import os
+from pathlib import Path
 
 class BaseAgent(ABC):
     """Base class for all agents in the framework"""
@@ -79,11 +81,34 @@ class BaseAgent(ABC):
         """
         pass
 
+    async def process_work_request_with_file(
+        self,
+        task: str,
+        context: str,
+        history: List[MessageHistory],
+        file: WorkRequestFile
+    ) -> Tuple[str, List[MessageHistory]]:
+        """Process a work request with an associated file
+        
+        Args:
+            task: The task to process
+            context: Context information for processing
+            history: List of previous message history
+            file: File information including local path
+            
+        Returns:
+            Tuple containing:
+                - result: The work result text
+                - history: Updated message history list
+        """
+        raise NotImplementedError("process_work_request_with_file not implemented")
+
     async def start_work(
         self,
         task: str,
         context: str,
-        history: List[MessageHistory]
+        history: List[MessageHistory],
+        file: Optional[WorkRequestFile] = None
     ) -> WorkResult:
         """Start an asynchronous work request"""
         work_id = str(uuid.uuid4())
@@ -92,12 +117,13 @@ class BaseAgent(ABC):
         work_result = WorkResult(
             work_id=work_id,
             status=WorkStatus.PENDING,
-            created_at=datetime.utcnow()
+            created_at=datetime.utcnow(),
+            file_path=file.file_path if file else None
         )
         self.work_items[work_id] = work_result
 
         # Start work in background
-        asyncio.create_task(self._execute_work(work_id, task, context, history))
+        asyncio.create_task(self._execute_work(work_id, task, context, history, file))
         
         return work_result
 
@@ -106,14 +132,22 @@ class BaseAgent(ABC):
         work_id: str,
         task: str,
         context: str,
-        history: List[MessageHistory]
+        history: List[MessageHistory],
+        file: Optional[WorkRequestFile] = None
     ):
         """Execute the work request and update status"""
         work_result = self.work_items[work_id]
         work_result.status = WorkStatus.IN_PROGRESS
         
         try:
-            result, updated_history = await self.process_work_request(task, context, history)
+            if file:
+                result, updated_history = await self.process_work_request_with_file(
+                    task, context, history, file
+                )
+            else:
+                result, updated_history = await self.process_work_request(
+                    task, context, history
+                )
             work_result.status = WorkStatus.COMPLETED
             work_result.result = result
             work_result.memory = updated_history

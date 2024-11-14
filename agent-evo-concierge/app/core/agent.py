@@ -1,6 +1,6 @@
 from typing import List, Tuple
 from core.agent_base import BaseAgent
-from core.schemas import MessageHistory
+from core.schemas import MessageHistory, WorkRequestFile
 from llama_index.agent.openai import OpenAIAgent
 from core.azure_openai_llm import AzureOpenAILLM
 import os
@@ -74,3 +74,15 @@ class ConciergeAgent(BaseAgent):
         updated_history = history + [task_message, response_message]
         
         return result, updated_history
+
+    async def process_work_request_with_file(
+        self,
+        task: str,
+        context: str,
+        history: List[MessageHistory],
+        file: WorkRequestFile
+    ) -> Tuple[str, List[MessageHistory]]:
+        """Process work request with file"""
+        # For Concierge, we'll just acknowledge the file
+        enhanced_context = f"{context}\n\nFile received: {file.filename}"
+        return await self.process_work_request(task, enhanced_context, history)

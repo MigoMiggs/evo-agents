@@ -42,7 +42,8 @@ class BaseAgentService:
             return await self.agent.start_work(
                 work_request.task,
                 work_request.context,
-                work_request.history
+                work_request.history,
+                work_request.file
             )
         except Exception as e:
             return WorkResult(

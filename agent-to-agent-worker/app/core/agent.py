@@ -2,6 +2,7 @@ from typing import List, Tuple
 from core.agent_base import BaseAgent
 from core.schemas import MessageHistory
 from core.schemas import WorkAgentToAgent
+from core.schemas import WorkRequestFile
 from core.client.http import HttpAgentClient
 from core.schemas import Message
 from llama_index.agent.openai import OpenAIAgent
@@ -211,5 +212,17 @@ class AgentWorker(BaseAgent):
         final_message_content = final_message.message.content
 
         return final_message_content, target_agent_chat_history
+
+    async def process_work_request_with_file(
+        self,
+        task: str,
+        context: str,
+        history: List[MessageHistory],
+        file: WorkRequestFile
+    ) -> Tuple[str, List[MessageHistory]]:
+        """Process work request with file"""
+        # For agent worker, pass file information in context
+        enhanced_context = f"{context}\n\nProcessing file: {file.filename}"
+        return await self.process_work_request(task, enhanced_context, history)
 
     

@@ -1,6 +1,21 @@
-from fastapi import APIRouter, HTTPException
-from core.schemas import Message, WorkRequest, AgentResponse
+from fastapi import APIRouter, HTTPException, File, UploadFile, Depends
+from core.schemas import Message, WorkRequest, AgentResponse, WorkRequestFile, WorkResult
 from app.services.agent_service import ResumeAgentService
+import shutil
+from pathlib import Path
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+
+app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 router = APIRouter()
 agent_service = ResumeAgentService()
@@ -53,5 +68,35 @@ async def process_work_request(work_request: WorkRequest):
     """
     try:
         return agent_service.process_work_request(work_request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/work-request-with-file", response_model=WorkResult)
+async def process_work_request_with_file(
+    work_request: WorkRequest,
+    file: UploadFile = File(...)
+):
+    """Process work request with file upload"""
+    try:
+        # Create uploads directory if it doesn't exist
+        upload_dir = Path("uploads")
+        upload_dir.mkdir(exist_ok=True)
+        
+        # Save uploaded file
+        file_path = upload_dir / file.filename
+        with file_path.open("wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        # Create WorkRequestFile
+        work_file = WorkRequestFile(
+            filename=file.filename,
+            content_type=file.content_type,
+            file_path=str(file_path)
+        )
+        
+        # Add file to work request
+        work_request.file = work_file
+        
+        return await agent_service.process_work_request(work_request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 

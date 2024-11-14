@@ -1,6 +1,6 @@
 from typing import List, Tuple
 from core.agent_base import BaseAgent
-from core.schemas import MessageHistory
+from core.schemas import MessageHistory, WorkRequestFile
 from core.azure_openai_llm import AzureOpenAILLM
 
 class ResumeAgent(BaseAgent):
@@ -41,3 +41,21 @@ class ResumeAgent(BaseAgent):
     def initialize_resume_index(self):
         # Initialize RAG index implementation
         pass
+
+    async def process_work_request_with_file(
+        self,
+        task: str,
+        context: str,
+        history: List[MessageHistory],
+        file: WorkRequestFile
+    ) -> Tuple[str, List[MessageHistory]]:
+        """Process work request with resume file"""
+        # Read and process the uploaded resume file
+        with open(file.file_path, 'r') as f:
+            resume_content = f.read()
+            
+        # Add resume content to context
+        enhanced_context = f"{context}\n\nResume Content:\n{resume_content}"
+        
+        # Process using existing work request logic with enhanced context
+        return await self.process_work_request(task, enhanced_context, history)
