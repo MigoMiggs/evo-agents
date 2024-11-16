@@ -81,36 +81,24 @@ class HttpAgentClient(BaseAgentClient):
         # Prepare multipart form data
         data = aiohttp.FormData()
         
-       
+        # Add the required form fields
+        data.add_field('filename', filename)
+        data.add_field('content_type', content_type)
+        data.add_field('task', work_request.task)
+        data.add_field('context', work_request.context)
+
         # Add the file
         data.add_field('file',
                       file,
                       filename=filename,
                       content_type=content_type)
-      
-         # Add work request fields as form data
-        #data.add_field('task', str(work_request.task))
-        #data.add_field('context', str(work_request.context or ""))
 
-        headers = {
-            'Accept': 'application/json',
-        }
-
-        url = self._get_url(f'/agent/work-request-with-file')
-
-        # Print request body for debugging
-        print("Request body:")
-        for field in data._fields:
-            print(f"Field {field[0]}: {field[2]}")
-            
         async with self.session.post(
             self._get_url('/agent/work-request-with-file'),
             data=data,
-            headers=headers
         ) as response:
             response.raise_for_status()
             data = await response.json()
-            print(data)
             return WorkResult(**data)
             
     async def get_work_result(self, work_id: str) -> WorkResult:

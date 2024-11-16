@@ -6,17 +6,16 @@ from core.azure_openai_llm import AzureOpenAILLM
 import os
 from llama_index.core import Settings
 from dotenv import load_dotenv
+import logging
+
+# Get logger
+logger = logging.getLogger("evo_concierge")
 
 load_dotenv()
+
 class ConciergeAgent(BaseAgent):
-    
-    agent = None
-
-    INTERNAL_CONTEXT = ("Your name is Evo the Concierge. \n"
-                        "You can help the user navigate through the Evolve system."
-    )
-
     def __init__(self):
+        logger.info("Initializing ConciergeAgent")
         self.llm = AzureOpenAILLM(
             model_config={
                 "deployment_name": os.getenv("AZURE_OPEN_AI_DEPLOYMENT_ID"),
@@ -26,7 +25,7 @@ class ConciergeAgent(BaseAgent):
                 "api_version": os.getenv("AZURE_API_VERSION")
             }
         )
-
+        logger.debug("LLM initialized successfully")
         super().__init__()
 
     def process_message(
@@ -36,28 +35,11 @@ class ConciergeAgent(BaseAgent):
         context: str,
         history: List[MessageHistory]
     ) -> Tuple[str, List[MessageHistory]]:
-        # Concierge-specific message processing implementation
-
-        sys_prompt = self.AGENT_SYS_PROMPT_TEMPLATE.format(
-            agent_internal_context=self.INTERNAL_CONTEXT,
-            agent_external_context=context
-        )
-
-        chat_history = self.history_to_chat_messages(history)
-
-        self.agent = OpenAIAgent.from_tools(    
-            llm=self.llm.llm,
-            system_prompt=sys_prompt, 
-            chat_history=chat_history
-        )
-
-        print(sys_prompt)
-        response = self.agent.chat(message)
-        response_memory = self.agent.memory.get_all()
-
-        # convert response memory to list of MessageHistory objects
-        response_memory = [MessageHistory(role=m.role, content=m.content) for m in response_memory]
-        return response.response, response_memory
+        logger.info(f"Processing message from role: {role}")
+        logger.debug(f"Message content: {message}")
+        logger.debug(f"Context: {context}")
+        
+        # Rest of your implementation...
 
     async def process_work_request(
         self,

@@ -151,6 +151,7 @@ class BaseAgent(ABC):
             work_result.status = WorkStatus.COMPLETED
             work_result.result = result
             work_result.memory = updated_history
+            work_result.file_path = file.file_path if file else None
         except Exception as e:
             work_result.status = WorkStatus.FAILED
             work_result.error = str(e)

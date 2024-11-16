@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict, Any, BinaryIO
 from enum import Enum
 from datetime import datetime
+from fastapi import UploadFile
 
 class MessageHistory(BaseModel):
     role: str
@@ -13,10 +14,16 @@ class Message(BaseModel):
     context: str
     history: Optional[List[MessageHistory]] = None
 
+class MessageForFile(BaseModel):
+    message: str
+    file_path: str
+    history: Optional[List[MessageHistory]] = None
+
 class WorkRequestFile(BaseModel):
     filename: str
     content_type: str
     file_path: str  # Path where file is stored locally
+
 
 class WorkRequest(BaseModel):
     task: str = "task"

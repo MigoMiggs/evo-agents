@@ -4,10 +4,10 @@ import argparse
 from pathlib import Path
 from typing import List, Optional
 from core.client import HttpAgentClient
-from core.schemas import WorkRequest, MessageHistory
+from core.schemas import WorkRequest, MessageHistory, MessageForFile
 import aiohttp
 import json
-
+from core.schemas import WorkResult
 
 async def upload_file_to_agent(
     base_url: str,
@@ -15,7 +15,7 @@ async def upload_file_to_agent(
     task: str,
     context: str = "",
     history: Optional[List[MessageHistory]] = None
-):
+) -> WorkResult:
     """Upload a file to an agent and process it"""
     
     if history is None:
@@ -80,9 +80,12 @@ async def upload_file_to_agent(
             print("-" * 40)
             if response.status == "completed":
                 print(response.result)
+                print(response.file_path)
             else:
                 print(f"Error: {response.error}")
             print("-" * 40)
+
+            return response.file_path
                 
         except Exception as e:
             print(f"Error communicating with agent: {str(e)}")
@@ -113,12 +116,63 @@ def main():
     args = parser.parse_args()
     
     # Run the async function
-    asyncio.run(upload_file_to_agent(
+    file_path = asyncio.run(upload_file_to_agent(
         base_url=args.url,
         file_path=args.file,
         task=args.task,
         context=args.context
     ))
+
+    print(f"File path: {file_path}")
+
+async def process_message_for_file(
+    base_url: str,
+    file_path: str,
+    message: str,
+    history: Optional[List[MessageHistory]] = None
+):
+    """
+    Send a message query about a specific file to the agent.
+    
+    Args:
+        base_url: Base URL of the agent service
+        file_path: Path to the file to query about
+        message: Message/question about the file
+        history: Optional message history
+        
+    Returns:
+        AgentResponse containing the result
+    """
+    try:
+        # Create agent client
+        client = HttpAgentClient(base_url)
+        
+        # Create message request
+        message_request = MessageForFile(
+            file_path=file_path,
+            message=message,
+            history=history or []
+        )
+        
+        # Send request and wait for response
+        print(f"\nSending message about file: {file_path}")
+        print(f"Message: {message}")
+        print("-" * 40)
+        
+        async with client:
+            response = await client.process_message_for_file(message_request)
+            
+        # Print result
+        print("\nResponse:")
+        print("-" * 40)
+        print(response.result)
+        print("-" * 40)
+        
+        return response
+        
+    except Exception as e:
+        print(f"Error communicating with agent: {str(e)}")
+        raise
 
 if __name__ == "__main__":
     main() 

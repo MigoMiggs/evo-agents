@@ -1,8 +1,11 @@
 from typing import Dict, Any, Optional
-from core.schemas import Message, WorkRequest, AgentResponse, WorkResult
+from core.schemas import Message, WorkRequest, AgentResponse, WorkResult, MessageForFile
 from core.agent_base import BaseAgent
 import uuid
 from datetime import datetime
+import logging
+
+logger = logging.getLogger("evo_concierge")
 
 class BaseAgentService:
     """Base service class for handling agent operations"""
@@ -10,6 +13,7 @@ class BaseAgentService:
     def __init__(self, agent: BaseAgent):
         self.agent = agent
         self.status = "idle"
+        self.work_results: Dict[str, WorkResult] = {}
 
     def restart(self) -> Dict[str, str]:
         """Restart the agent service"""
@@ -24,12 +28,32 @@ class BaseAgentService:
                 message.message,
                 message.role,
                 message.context,
-                message.history
+                message.history or []
             )
             self.status = "completed"
             return AgentResponse(status="completed", result=result, memory=response_memory)
         except Exception as e:
+            logger.error(f"Error processing message: {str(e)}", exc_info=True)
             self.status = "failed"
+            return AgentResponse(status="failed", error=str(e))
+
+    def process_message_for_file(self, message: Message) -> AgentResponse:
+        """
+        Process a message specifically for file-based queries.
+        This can be overridden by specific agents to handle file content differently.
+        """
+        try:
+            logger.info("Processing file-based message")
+            # By default, use the same processing as regular messages
+            result, response_memory = self.agent.process_message(
+                message.message,
+                message.role,
+                message.context,
+                message.history or []
+            )
+            return AgentResponse(status="completed", result=result, memory=response_memory)
+        except Exception as e:
+            logger.error(f"Error processing file message: {str(e)}", exc_info=True)
             return AgentResponse(status="failed", error=str(e))
 
     def get_status(self) -> Dict[str, str]:
